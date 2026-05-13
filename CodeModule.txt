@@ -1,0 +1,81 @@
+Option Explicit
+Global msg1 As String, nScenarios As Integer
+
+
+Sub SolverTransportation()
+ wsModel.Activate
+        ' First, rename ranges.
+       Range("b20").Name = "TotalCost"
+       Range("c13:f15").Name = "Shipped"
+       Range("g13:g15").Name = "ShippedFrom"
+       Range("i13:i15").Name = "Supply"
+       Range("c16:f16").Name = "ShippedTo"
+       Range("c18:f18").Name = "Demand"
+       
+        
+        ' Set up Solver and run it.
+       
+       solverreset
+       solverok setcell:="TotalCost", maxminval:=2, bychange:="shipped", engine:=2
+       solveradd cellref:="shippedfrom", relation:=1, formulatext:="Supply"
+       solveradd cellref:="shippedTo", relation:=3, formulatext:="Demand"
+       SolverOptions AssumeLinear:=True, AssumeNonNeg:=True, Iterations:=100
+       
+       solversolve userfinish:=True, ShowRef:=False
+End Sub
+
+
+Sub Scenarios()
+    Dim p As Integer, c As Integer, s As Integer
+    wsResults.Cells.ClearContents
+    wsResults.Range("A1").Value = "Shipments and total cost for each scenario"
+    Application.Calculation = xlCalculationManual
+    Application.ScreenUpdating = False
+    
+    ' Find the number of scenarios.
+    nScenarios = wsScenarios.Range(wsScenarios.Range("B3"), wsScenarios.Range("B3").End(xlToRight)).Cells.Count
+    ' Loop over all scenarios.
+    For s = 1 To nScenarios
+    With wsScenarios.Range("B5").Offset(0, s - 1)
+    ' Transfer capacities to Model sheet.
+        For p = 1 To 3
+            wsModel.Range("Supply").Cells(p) = .Offset(p - 1, 0)
+        Next p
+    End With
+    
+     ' Transfer demands to Model sheet.
+    With wsScenarios.Range("B10").Offset(0, s - 1)
+    For c = 1 To 4
+        wsModel.Range("Demand").Cells(c) = .Offset(c - 1, 0)
+    Next c
+    End With
+    ' Run the Solver, which is already set up
+    wsModel.Calculate
+    Call SolverTransportation
+    
+    ' Transfer results to the Results sheet.  Note that the "Scenario" labels
+    ' will be in cells A3, A9, A15, and so on.
+    ' First, enter labels.
+    With wsResults.Range("A3").Offset(((s - 1) * 6), 0)
+            .Offset(0, 0) = "Scenario " & s
+            .Offset(1, 0) = "Shipments"
+            .Offset(1, 5) = "Total Cost"
+        For p = 1 To 3
+            For c = 1 To 4
+                .Offset(p + 1, c - 1) = wsModel.Range("Shipped").Cells(p, c)
+                Next c
+            Next p
+
+            
+        ' Next, transfer the data from the optimal solution.
+                    .Offset(2, 5) = wsModel.Range("TotalCost")
+        End With
+    Next s
+Application.Calculation = xlCalculationAutomatic
+Application.ScreenUpdating = True
+
+End Sub
+
+Sub NewScenario()
+    UserForm.Show
+End Sub

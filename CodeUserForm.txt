@@ -1,0 +1,52 @@
+
+Private Sub CmdCancel_Click()
+Unload Me
+msg1 = MsgBox("You canceled the form! Have a great day!", vbInformation, "New Scenario")
+End Sub
+
+Private Sub CmdCreate_Click()
+    Dim TotalDemand As Double, TotalSupply As Double
+    Dim p As Integer, c As Integer, s As Integer
+    TotalDemand = Val(Txtcy1.Value) + Val(Txtcy2.Value) + Val(Txtcy3.Value) + Val(Txtcy4.Value)
+    TotalSupply = Val(Txtpt1.Value) + Val(Txtpt2.Value) + Val(Txtpt3.Value)
+    
+    If TotalDemand > TotalSupply Then
+        msg1 = MsgBox("You cannot have more demand than supply! Please try again!", vbInformation, "New Scenario")
+    Else
+        Application.Calculation = xlCalculationManual
+        Application.ScreenUpdating = False
+
+    ' Define Supply and Demand from TextBoxes
+    wsModel.Range("Supply").Cells(1) = Val(Txtpt1.Value)
+    wsModel.Range("Supply").Cells(2) = Val(Txtpt2.Value)
+    wsModel.Range("Supply").Cells(3) = Val(Txtpt3.Value)
+
+    wsModel.Range("Demand").Cells(1) = Val(Txtcy1.Value)
+    wsModel.Range("Demand").Cells(2) = Val(Txtcy2.Value)
+    wsModel.Range("Demand").Cells(3) = Val(Txtcy3.Value)
+    wsModel.Range("Demand").Cells(4) = Val(Txtcy4.Value)
+
+    ' Run Solver
+    wsModel.Calculate
+    Call SolverTransportation
+
+    ' Write New Scenario to wsResults
+    With wsResults.Range("A3").Offset(30, 0)
+        .Offset(0, 0) = "Scenario 6"
+        .Offset(1, 0) = "Shipments"
+        .Offset(1, 5) = "Total Cost"
+        For p = 1 To 3
+            For c = 1 To 4
+                .Offset(p + 1, c - 1) = wsModel.Range("Shipped").Cells(p, c)
+            Next c
+        Next p
+        .Offset(2, 5) = wsModel.Range("TotalCost")
+        .Offset(2, 5).NumberFormat = "$#,##"
+    End With
+
+    Application.Calculation = xlCalculationAutomatic
+    Application.ScreenUpdating = True
+    Unload Me
+    msg1 = MsgBox("New Scenario created successfully!", vbInformation, "New Scenario")
+End If
+End Sub
