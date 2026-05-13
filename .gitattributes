@@ -1,0 +1,14 @@
+# Recognize VBA code files
+*.bas linguist-language=VBA
+*.cls linguist-language=VBA
+*.frm linguist-language=VBA
+CodeModule.txt linguist-language=VBA
+CodeUserForm.txt linguist-language=VBA
+
+# Excel files
+*.xlsm linguist-detectable=true
+*.xlsx linguist-detectable=true
+*.xls linguist-detectable=true
+
+# Set the primary language for the repository
+* linguist-vendored=false

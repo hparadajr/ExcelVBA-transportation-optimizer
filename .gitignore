@@ -1,0 +1,20 @@
+# Excel temporary files
+~$*.xlsx
+~$*.xls
+~$*.xlsm
+*.xlk
+
+# Windows
+Thumbs.db
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
