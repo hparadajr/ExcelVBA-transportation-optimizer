@@ -23,6 +23,13 @@ Displays:
 - Total transportation cost for each scenario
 - Custom scenario results generated from the UserForm
 
+Skills Demonstrated:
+- Transportation optimization
+- Linear programming
+- Excel Solver
+- Scenario analysis
+- Data validation
+- UserForm development
 
 ---
 
