@@ -31,7 +31,7 @@ Displays:
 2. Enable macros
 3. Ensure the Excel Solver Add-in is enabled
 4. Run the `Scenarios()` macro to solve all predefined scenarios
-5. Use the "Create your own scenario!" button to generate custom scenarios
+5. Use the "Create your own scenario!" button in the results worksheet to generate custom scenarios
 
 ---
 
